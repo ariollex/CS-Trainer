@@ -25,17 +25,17 @@ jobs:
 
       - name: Run flake8 to validate code style (PEP8)
         run: |
-          flake8 .
+          flake8 . --max-line-length=120
 
   deploy:
-    name: Deploy to Raspberry Pi
+    name: Deploy
     needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Synchronize repository and run main.py on Raspberry Pi
+      - name: Synchronize repository and run main.py
         uses: appleboy/ssh-action@v0.1.11
         with:
           host: ${{ secrets.PI_HOST }}
@@ -43,7 +43,7 @@ jobs:
           key: ${{ secrets.PI_PRIVATE_KEY }}
           port: ${{ secrets.PI_PORT }}
           script: |
-            echo "Переход в директорию приложения"
+            echo "Navigating to the application directory"
             cd "${DEPLOY_PATH}"
-            echo "Получение последних изменений из репозитория"
+            echo "Pulling the latest changes from the repository"
             git pull origin main

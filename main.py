@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, EmailStr
 import pymysql  # Для связи с базой данных
 from typing import Dict  # Типизация словаря
-from fastapi.middleware.cors import CORSMiddleware  
+from fastapi.middleware.cors import CORSMiddleware
 from enum import Enum  # Enum для создания перечислений
 import random  # Для генерации случайных чисел
 import uvicorn  # Для запуска приложения
@@ -163,16 +163,16 @@ class ErrorCodes:
     Используется для стандартизации ответов API.
     """
     ALREADY_VERIFIED = 'already_verified'
-    SAVING_FAILED = 'saving_failed' 
-    NOT_ONE_EMAIL = 'not_one_email' 
-    USER_NOT_FOUND = "user_not_found"  
-    INVALID_CREDENTIALS = "invalid_credentials" 
-    USER_EXISTS = "user_exists" 
-    INVALID_VERIFICATION_CODE = "invalid_verification_code"  
-    ACCOUNT_NOT_VERIFIED = "account_not_verified" 
-    PASSWORD_CHANGE_SUCCESS = "password_change_success" 
-    VERIFICATION_CODE_SENT = "verification_code_sent" 
-    REGISTRATION_SUCCESS = "registration_success" 
+    SAVING_FAILED = 'saving_failed'
+    NOT_ONE_EMAIL = 'not_one_email'
+    USER_NOT_FOUND = "user_not_found"
+    INVALID_CREDENTIALS = "invalid_credentials"
+    USER_EXISTS = "user_exists"
+    INVALID_VERIFICATION_CODE = "invalid_verification_code"
+    ACCOUNT_NOT_VERIFIED = "account_not_verified"
+    PASSWORD_CHANGE_SUCCESS = "password_change_success"
+    VERIFICATION_CODE_SENT = "verification_code_sent"
+    REGISTRATION_SUCCESS = "registration_success"
     VERIFICATION_SUCCESS = "verification_success"
 
 
@@ -366,7 +366,7 @@ def change_password(data: ChangePasswordRequest):
             detail={"code": ErrorCodes.INVALID_VERIFICATION_CODE}
         )
     # Обновляем пароль
-    trace_back = change_db_users(user['email'], 
+    trace_back = change_db_users(user['email'],
                                  (('password', data.password)))
     if trace_back != 'success':
         raise HTTPException(
