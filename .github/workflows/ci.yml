@@ -43,8 +43,9 @@ jobs:
           key: ${{ secrets.PI_PRIVATE_KEY }}
           port: ${{ secrets.PI_PORT }}
           script: |
-            echo "Navigating to the application directory"
-            cd "${DEPLOY_PATH}"
-            pwd
-            echo "Pulling the latest changes from the repository"
+            echo "Текущая директория: $(pwd)"
+            echo "Переход в: ${DEPLOY_PATH}"
+            cd "${DEPLOY_PATH}" || exit 1
+            echo "Содержимое папки:"
+            ls -la
             git pull origin main
