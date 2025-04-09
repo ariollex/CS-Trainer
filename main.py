@@ -1,7 +1,9 @@
 # Импортируем необходимые модули и библиотеки
-from fastapi import FastAPI, HTTPException  # FastAPI для создания API, HTTPException для обработки ошибок
-from pydantic import BaseModel, EmailStr  # BaseModel для валидации данных, EmailStr для проверки email
-import pymysql #Для связи с базой данных
+# FastAPI для создания API, HTTPException для обработки ошибок
+from fastapi import FastAPI, HTTPException
+# BaseModel для валидации данных, EmailStr для проверки email
+from pydantic import BaseModel, EmailStr
+import pymysql  # Для связи с базой данных
 from typing import Dict  # Типизация словаря
 from fastapi.middleware.cors import CORSMiddleware  # Middleware для настройки CORS
 from enum import Enum  # Enum для создания перечислений
@@ -20,7 +22,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Разрешенные источники
     allow_credentials=True,  # Разрешение на передачу cookies
-    allow_methods=["*"],  # Разрешение всех HTTP-методов (GET, POST, PUT, DELETE и т.д.)
+    # Разрешение всех HTTP-методов (GET, POST, PUT, DELETE и т.д.)
+    allow_methods=["*"],
     allow_headers=["*"],  # Разрешение всех заголовков
 )
 
@@ -30,12 +33,17 @@ app.add_middleware(
 users = get_dict_users()
 
 # Функция для генерации 6-значного кода верификации
+
+
 def generate_verification_code() -> str:
     """
     Генерирует случайный 6-значный код.
     Возвращает строку с ведущими нулями, если число меньше 6 цифр.
     """
-    code = f"{random.randint(0, 999999):06d}"  # Генерация числа от 0 до 999999, форматирование до 6 цифр
+    code = f"{
+        random.randint(
+            0,
+            999999):06d}"  # Генерация числа от 0 до 999999, форматирование до 6 цифр
     return code
 
 
@@ -46,8 +54,10 @@ def print_verification_code(email: str, code: str):
     Используется только для разработки.
     """
     print("\n" + "═" * 50)  # Разделитель
-    print(f"📧 Получатель: \033[1;34m{email}\033[0m")  # Email пользователя (синий цвет)
-    print(f"🔢 Код верификации: \033[1;32m{code}\033[0m")  # Код верификации (зеленый цвет)
+    # Email пользователя (синий цвет)
+    print(f"📧 Получатель: \033[1;34m{email}\033[0m")
+    # Код верификации (зеленый цвет)
+    print(f"🔢 Код верификации: \033[1;32m{code}\033[0m")
     print("═" * 50 + "\n")  # Разделитель
 
 
@@ -156,9 +166,9 @@ class ErrorCodes:
     Класс с кодами ошибок и сообщений.
     Используется для стандартизации ответов API.
     """
-    ALREADY_VERIFIED = 'already_verified' # Аккаунт уже подтвержден
-    SAVING_FAILED = 'saving_failed' # Сохранение в базу данных не удалось
-    NOT_ONE_EMAIL = 'not_one_email' # Существуют пользователи с одинаковыми email
+    ALREADY_VERIFIED = 'already_verified'  # Аккаунт уже подтвержден
+    SAVING_FAILED = 'saving_failed'  # Сохранение в базу данных не удалось
+    NOT_ONE_EMAIL = 'not_one_email'  # Существуют пользователи с одинаковыми email
     USER_NOT_FOUND = "user_not_found"  # Пользователь не найден
     INVALID_CREDENTIALS = "invalid_credentials"  # Неверные учетные данные
     USER_EXISTS = "user_exists"  # Пользователь уже существует
@@ -223,7 +233,12 @@ def register(data: RegisterRequest):
     verification_code = generate_verification_code()
 
     # Сохраняем данные пользователя в "базу данных"
-    trace_back = save_user(data.email, data.password, data.nickname, False, verification_code)
+    trace_back = save_user(
+        data.email,
+        data.password,
+        data.nickname,
+        False,
+        verification_code)
     if trace_back != 'success':
         raise HTTPException(
             # справить код ошибки
@@ -294,7 +309,8 @@ def recover(data: RecoverRequest):
     user = users[data.email]
     # Генерируем код восстановления
     verification_code = generate_verification_code()
-    trace_back = change_db_users(user['email'], (('verification_code', verification_code)))
+    trace_back = change_db_users(
+        user['email'], (('verification_code', verification_code)))
     if trace_back != 'success':
         raise HTTPException(
             # справить код ошибки
@@ -303,7 +319,7 @@ def recover(data: RecoverRequest):
         )
 
     # Выводим код восстановления в терминал
-    print_verification_code(user['email'] , verification_code)
+    print_verification_code(user['email'], verification_code)
 
     # Возвращаем сообщение об успешной отправке кода
     return {
@@ -391,7 +407,8 @@ def resend_code(data: ResendCodeRequest):
 
     # Генерируем новый код
     new_code = generate_verification_code()
-    trace_back = change_db_users(user['email'], (('verification_code', new_code)))
+    trace_back = change_db_users(
+        user['email'], (('verification_code', new_code)))
     if trace_back != 'success':
         raise HTTPException(
             # справить код ошибки
