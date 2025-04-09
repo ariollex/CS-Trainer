@@ -1,6 +1,8 @@
 # Импортируем необходимые модули и библиотеки
-from fastapi import FastAPI, HTTPException  # FastAPI для создания API, HTTPException для обработки ошибок
-from pydantic import BaseModel, EmailStr  # BaseModel для валидации данных, EmailStr для проверки email
+# FastAPI для создания API, HTTPException для обработки ошибок
+from fastapi import FastAPI, HTTPException
+# BaseModel для валидации данных, EmailStr для проверки email
+from pydantic import BaseModel, EmailStr
 from typing import Dict  # Типизация словаря
 from fastapi.middleware.cors import CORSMiddleware  # Middleware для настройки CORS
 from enum import Enum  # Enum для создания перечислений
@@ -19,7 +21,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Разрешенные источники
     allow_credentials=True,  # Разрешение на передачу cookies
-    allow_methods=["*"],  # Разрешение всех HTTP-методов (GET, POST, PUT, DELETE и т.д.)
+    # Разрешение всех HTTP-методов (GET, POST, PUT, DELETE и т.д.)
+    allow_methods=["*"],
     allow_headers=["*"],  # Разрешение всех заголовков
 )
 
@@ -27,26 +30,37 @@ app.add_middleware(
 users: Dict[str, dict] = {}
 
 # Функция для генерации 6-значного кода верификации
+
+
 def generate_verification_code() -> str:
     """
     Генерирует случайный 6-значный код.
     Возвращает строку с ведущими нулями, если число меньше 6 цифр.
     """
-    code = f"{random.randint(0, 999999):06d}"  # Генерация числа от 0 до 999999, форматирование до 6 цифр
+    code = f"{
+        random.randint(
+            0,
+            999999):06d}"  # Генерация числа от 0 до 999999, форматирование до 6 цифр
     return code
 
 # Функция для вывода кода верификации в терминал (для разработки)
+
+
 def print_verification_code(email: str, code: str):
     """
     Выводит код верификации в терминал в красивом формате.
     Используется только для разработки.
     """
     print("\n" + "═" * 50)  # Разделитель
-    print(f"📧 Получатель: \033[1;34m{email}\033[0m")  # Email пользователя (синий цвет)
-    print(f"🔢 Код верификации: \033[1;32m{code}\033[0m")  # Код верификации (зеленый цвет)
+    # Email пользователя (синий цвет)
+    print(f"📧 Получатель: \033[1;34m{email}\033[0m")
+    # Код верификации (зеленый цвет)
+    print(f"🔢 Код верификации: \033[1;32m{code}\033[0m")
     print("═" * 50 + "\n")  # Разделитель
 
 # Модели запросов для валидации входных данных
+
+
 class LoginRequest(BaseModel):
     """
     Модель для запроса на вход (логин).
@@ -56,6 +70,7 @@ class LoginRequest(BaseModel):
     """
     email: str
     password: str
+
 
 class RegisterRequest(BaseModel):
     """
@@ -69,6 +84,7 @@ class RegisterRequest(BaseModel):
     password: str
     nickname: str
 
+
 class VerifyRequest(BaseModel):
     """
     Модель для запроса на верификацию email.
@@ -79,6 +95,7 @@ class VerifyRequest(BaseModel):
     email: EmailStr
     code: str
 
+
 class RecoverRequest(BaseModel):
     """
     Модель для запроса на восстановление пароля.
@@ -86,6 +103,7 @@ class RecoverRequest(BaseModel):
     - email: Email пользователя
     """
     email: EmailStr
+
 
 class RecoverVerifyRequest(BaseModel):
     """
@@ -96,6 +114,7 @@ class RecoverVerifyRequest(BaseModel):
     """
     email: EmailStr
     code: str
+
 
 class ChangePasswordRequest(BaseModel):
     """
@@ -109,6 +128,7 @@ class ChangePasswordRequest(BaseModel):
     code: str
     password: str
 
+
 class CodeType(str, Enum):
     """
     Перечисление типов кодов:
@@ -117,6 +137,7 @@ class CodeType(str, Enum):
     """
     VERIFICATION = "verification"
     RECOVERY = "recovery"
+
 
 class ResendCodeRequest(BaseModel):
     """
@@ -129,6 +150,8 @@ class ResendCodeRequest(BaseModel):
     code_type: CodeType
 
 # Функция для генерации фиктивного токена
+
+
 def generate_token(email: str) -> str:
     """
     Генерирует фиктивный токен для пользователя.
@@ -137,6 +160,8 @@ def generate_token(email: str) -> str:
     return f"fake-token-for-{email}"
 
 # Коды сообщений для локализации ошибок и успешных операций
+
+
 class ErrorCodes:
     """
     Класс с кодами ошибок и сообщений.
@@ -153,6 +178,8 @@ class ErrorCodes:
     VERIFICATION_SUCCESS = "verification_success"  # Верификация успешна
 
 # Обработчик для входа (логина)
+
+
 @app.post("/auth/login")
 def login(data: LoginRequest):
     """
@@ -165,7 +192,7 @@ def login(data: LoginRequest):
             status_code=404,
             detail={"code": ErrorCodes.USER_NOT_FOUND}
         )
-    
+
     user = users[data.email]  # Получаем данные пользователя
 
     if user["password"] != data.password:
@@ -174,18 +201,20 @@ def login(data: LoginRequest):
             status_code=401,
             detail={"code": ErrorCodes.INVALID_CREDENTIALS}
         )
-    
+
     if not user.get("verified", False):
         # Если аккаунт не верифицирован, возвращаем ошибку 403
         raise HTTPException(
             status_code=403,
             detail={"code": ErrorCodes.ACCOUNT_NOT_VERIFIED}
         )
-    
+
     # Возвращаем токен при успешной авторизации
     return {"token": generate_token(data.email)}
 
 # Обработчик для регистрации
+
+
 @app.post("/auth/register")
 def register(data: RegisterRequest):
     """
@@ -198,10 +227,10 @@ def register(data: RegisterRequest):
             status_code=400,
             detail={"code": ErrorCodes.USER_EXISTS}
         )
-    
+
     # Генерируем код верификации
     verification_code = generate_verification_code()
-    
+
     # Сохраняем данные пользователя в "базу данных"
     users[data.email] = {
         "email": data.email,
@@ -210,10 +239,10 @@ def register(data: RegisterRequest):
         "verified": False,
         "verification_code": verification_code
     }
-    
+
     # Выводим код верификации в терминал
     print_verification_code(data.email, verification_code)
-    
+
     # Возвращаем сообщение об успешной регистрации
     return {
         "message": {"code": ErrorCodes.REGISTRATION_SUCCESS},
@@ -221,6 +250,8 @@ def register(data: RegisterRequest):
     }
 
 # Обработчик для верификации email
+
+
 @app.post("/auth/verify")
 def verify(data: VerifyRequest):
     """
@@ -248,6 +279,8 @@ def verify(data: VerifyRequest):
     }
 
 # Обработчик для восстановления пароля
+
+
 @app.post("/auth/recover")
 def recover(data: RecoverRequest):
     """
@@ -261,20 +294,22 @@ def recover(data: RecoverRequest):
             status_code=404,
             detail={"code": ErrorCodes.USER_NOT_FOUND}
         )
-    
+
     # Генерируем код восстановления
     verification_code = generate_verification_code()
     user["verification_code"] = verification_code
-    
+
     # Выводим код восстановления в терминал
     print_verification_code(data.email, verification_code)
-    
+
     # Возвращаем сообщение об успешной отправке кода
     return {
         "message": {"code": ErrorCodes.VERIFICATION_CODE_SENT},
     }
 
 # Обработчик для проверки кода восстановления
+
+
 @app.post("/auth/recover/verify")
 def recover_verify(data: RecoverVerifyRequest):
     """
@@ -296,6 +331,8 @@ def recover_verify(data: RecoverVerifyRequest):
     return {"message": {"code": "recovery_verified"}}
 
 # Обработчик для смены пароля
+
+
 @app.post("/auth/recover/change")
 def change_password(data: ChangePasswordRequest):
     """
@@ -323,6 +360,8 @@ def change_password(data: ChangePasswordRequest):
     }
 
 # Обработчик для повторной отправки кода
+
+
 @app.post("/auth/verify/resend")
 def resend_code(data: ResendCodeRequest):
     """
@@ -336,7 +375,7 @@ def resend_code(data: ResendCodeRequest):
             status_code=404,
             detail={"code": ErrorCodes.USER_NOT_FOUND}
         )
-    
+
     if data.code_type == CodeType.VERIFICATION:
         if user.get("verified", False):
             # Если аккаунт уже верифицирован, возвращаем ошибку 400
@@ -356,6 +395,7 @@ def resend_code(data: ResendCodeRequest):
     return {
         "message": {"code": ErrorCodes.VERIFICATION_CODE_SENT},
     }
+
 
 # Точка входа в приложение
 if __name__ == "__main__":
