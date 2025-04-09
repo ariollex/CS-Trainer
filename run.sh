@@ -11,9 +11,9 @@ if ! git pull origin main; then
     git pull origin main
 fi
 
-VENV_DIR="${DEPLOY_PATH}/venv"
-PID_FILE="${DEPLOY_PATH}/server.pid"
-LOG_FILE="${DEPLOY_PATH}/server.log"
+VENV_DIR="venv"
+PID_FILE="server.pid"
+LOG_FILE="server.log"
 
 if [ ! -d "${VENV_DIR}" ]; then
     python3 -m venv "${VENV_DIR}"
