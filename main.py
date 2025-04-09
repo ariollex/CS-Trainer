@@ -51,6 +51,11 @@ def print_verification_code(email: str, code: str):
     print("═" * 50 + "\n")  # Разделитель
 
 
+# Функция для обновления юзера в соответствии с базой данных
+def update_users():
+    global users
+    users = get_dict_users()
+
 # Модели запросов для валидации входных данных
 class LoginRequest(BaseModel):
     """
@@ -185,7 +190,6 @@ def login(data: LoginRequest):
         )
 
     user = users[data.email]  # Получаем данные пользователя
-
     if user["password"] != data.password:
         # Если пароль неверный, возвращаем ошибку 401
         raise HTTPException(
@@ -231,6 +235,8 @@ def register(data: RegisterRequest):
             detail={"code": ErrorCodes.SAVING_FAILED}
         )
 
+    # Обновляем список юзеров
+    update_users()
     # Выводим код верификации в терминал
     print_verification_code(str(data.email), verification_code)
 
@@ -270,6 +276,7 @@ def verify(data: VerifyRequest):
             status_code=500,
             detail={"code": ErrorCodes.SAVING_FAILED}
         )
+    update_users()
     return {
         "token": generate_token(user['email']),
         "message": {"code": ErrorCodes.VERIFICATION_SUCCESS}
@@ -302,6 +309,7 @@ def recover(data: RecoverRequest):
             detail={"code": ErrorCodes.SAVING_FAILED}
         )
 
+    update_users()
     # Выводим код восстановления в терминал
     print_verification_code(user['email'] , verification_code)
 
@@ -330,6 +338,14 @@ def recover_verify(data: RecoverVerifyRequest):
             status_code=400,
             detail={"code": ErrorCodes.INVALID_VERIFICATION_CODE}
         )
+    trace_back = change_db_users(user['email'], (('verified', 1)))
+    if trace_back != 'success':
+        raise HTTPException(
+            # справить код ошибки
+            status_code=500,
+            detail={"code": ErrorCodes.SAVING_FAILED}
+        )
+    update_users()
     return {"message": {"code": "recovery_verified"}}
 
 
@@ -353,6 +369,15 @@ def change_password(data: ChangePasswordRequest):
             status_code=400,
             detail={"code": ErrorCodes.INVALID_VERIFICATION_CODE}
         )
+    # Устанавливаем статус verified
+    trace_back = change_db_users(user['email'], (('verified', 1)))
+    if trace_back != 'success':
+        raise HTTPException(
+            # справить код ошибки
+            status_code=500,
+            detail={"code": ErrorCodes.SAVING_FAILED}
+        )
+
     # Обновляем пароль
     trace_back = change_db_users(user['email'], (('password', data.password)))
     if trace_back != 'success':
@@ -361,6 +386,7 @@ def change_password(data: ChangePasswordRequest):
             status_code=500,
             detail={"code": ErrorCodes.SAVING_FAILED}
         )
+    update_users()
     return {
         "token": generate_token(user['email']),
         "message": {"code": ErrorCodes.PASSWORD_CHANGE_SUCCESS}
@@ -399,6 +425,7 @@ def resend_code(data: ResendCodeRequest):
             detail={"code": ErrorCodes.SAVING_FAILED}
         )
 
+    update_users()
     # Выводим новый код в терминал
     print_verification_code(user['email'], new_code)
 

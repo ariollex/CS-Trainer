@@ -11,7 +11,9 @@ def get_dict_users():
 
 def save_user(email, password, nickname, verified, verification_code):
     try:
-        cursor.execute(f"insert into users values ([{email}], {password}, {nickname}, {verified}, {verification_code}) ")
+        query = f"""insert users(email, password, nickname, verified, verification_code)
+            values ('{email}', '{password}', '{nickname}', {verified}, '{verification_code}')"""
+        cursor.execute(query)
         connection.commit()
     except pymysql.MySQLError as e:
         return f"Ошибка подключения: {e}"
@@ -21,7 +23,10 @@ def save_user(email, password, nickname, verified, verification_code):
 def change_db_users(email, *args):
     try:
         for i in args:
-            cursor.execute(f"UPDATE users SET {args[i][0]} = '{args[i][1]}' WHERE email = '{email}';")
+            query = f"""UPDATE users 
+                SET {i[0]} = '{i[1]}'
+                WHERE email = '{email}';"""
+            cursor.execute(query)
         connection.commit()
     except pymysql.MySQLError as e:
         return f"Ошибка подключения: {e}"
@@ -38,24 +43,16 @@ def user_information(email):
     return from_data_to_dct(data)
 
 def from_data_to_dct(data):
-    if len(data) == 1:
-        records = {'email': data[0][1],
-                   'password': data[0][2],
-                   'nickname': data[0][3],
-                   'verified': data[0][4],
-                   'verification_code': data[0][5]}
-    else:
-        records = list()
-        for i in data:
-            new_record = {i[1]: {'email': i[1],
-                   'password': i[2],
-                   'nickname': i[3],
-                   'verified': i[4],
-                   'verification_code': i[5]}}
-            records.append(new_record)
+    records = dict()
+    for i in data:
+        records[i[1]] = {'email': i[1],
+               'password': i[2],
+               'nickname': i[3],
+               'verified': i[4],
+               'verification_code': i[5]}
     return records
 
-with open('database_user_home.json') as file:
+with open('database_user.json') as file:
     file_json_data = json.load(file)
 try:
     connection = pymysql.connect(
