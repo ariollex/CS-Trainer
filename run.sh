@@ -2,8 +2,6 @@
 
 set -e
 
-cd "${DEPLOY_PATH}"
-
 echo "Updating code from Git repository..."
 git fetch --all
 if ! git pull origin main; then
