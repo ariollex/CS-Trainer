@@ -34,10 +34,7 @@ def generate_verification_code() -> str:
     Генерирует случайный 6-значный код.
     Возвращает строку с ведущими нулями, если число меньше 6 цифр.
     """
-    code = f"{
-        random.randint(
-            0,
-            999999):06d}"
+    code = f"{random.randint(0, 999999):06d}"
     return code
 
 
