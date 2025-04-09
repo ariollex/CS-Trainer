@@ -3,8 +3,6 @@
 from fastapi import FastAPI, HTTPException
 # BaseModel для валидации данных, EmailStr для проверки email
 from pydantic import BaseModel, EmailStr
-import pymysql  # Для связи с базой данных
-from typing import Dict  # Типизация словаря
 from fastapi.middleware.cors import CORSMiddleware
 from enum import Enum  # Enum для создания перечислений
 import random  # Для генерации случайных чисел
