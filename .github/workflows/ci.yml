@@ -1,4 +1,4 @@
-name: Prodaction CI
+name: Production CI
 
 on:
   push:
@@ -31,20 +31,21 @@ jobs:
     name: Deploy
     needs: lint
     runs-on: ubuntu-latest
-    env:
-        DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Synchronize repository and run main.py
         uses: appleboy/ssh-action@v1
+        env:
+            DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         with:
           host: ${{ secrets.PI_HOST }}
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_PRIVATE_KEY }}
           port: ${{ secrets.PI_PORT }}
           script: |
+            echo "Переход в: ${DEPLOY_PATH}"
             echo "Navigating to the application directory"
             cd "${DEPLOY_PATH}"
             echo "Pulling the latest changes from the repository"
