@@ -9,7 +9,6 @@ import random  # Для генерации случайных чисел
 import uvicorn  # Для запуска приложения
 from db_connection import get_dict_users, save_user, change_db_users
 
-# Создаем экземпляр приложения FastAPI
 app = FastAPI()
 
 origins = ["*"]

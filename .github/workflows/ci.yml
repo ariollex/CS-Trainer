@@ -48,6 +48,5 @@ jobs:
           script: |
             echo "Navigating to the application directory"
             cd "${DEPLOY_PATH}"
-            echo "Pulling the latest changes from the repository"
-            git pull origin main
+            echo "Running the script"
             ./run.sh
