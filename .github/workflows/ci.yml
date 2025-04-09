@@ -46,8 +46,8 @@ jobs:
           port: ${{ secrets.PI_PORT }}
           envs: DEPLOY_PATH
           script: |
-            echo "Переход в: ${DEPLOY_PATH}"
             echo "Navigating to the application directory"
             cd "${DEPLOY_PATH}"
             echo "Pulling the latest changes from the repository"
             git pull origin main
+            ./run.sh
