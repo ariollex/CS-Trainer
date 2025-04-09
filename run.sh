@@ -1,6 +1,20 @@
 #!/bin/bash
 set -e
 
+show_log_on_error() {
+    echo -e "\n❌ ERROR OCCURRED ❌"
+    echo "Last 50 lines of ${LOG_FILE}:"
+    
+    if [ -f "${LOG_FILE}" ]; then
+        tail -n 50 "${LOG_FILE}"
+    else
+        echo "Log file ${LOG_FILE} not found!"
+    fi
+    
+    echo -e "\n⚠️ Check full log at: ${LOG_FILE}"
+    exit 1
+}
+
 if [ -z "${RESTARTED}" ]; then
     export RESTARTED="true"
 else
@@ -70,9 +84,7 @@ echo $! > "${PID_FILE}"
 
 sleep 3
 if ! ps -p $(cat "${PID_FILE}") > /dev/null; then
-    echo "Error: Server failed to start!"
-    echo "Check log file: ${LOG_FILE}"
-    exit 1
+    show_log_on_error
 fi
 
 echo "Server started successfully (PID: $(cat "${PID_FILE}"))"
