@@ -23,11 +23,9 @@ def save_user(email, password, nickname, verified, verification_code):
 
 def change_db_users(email, *args):
     try:
-        for i in args:
+        for field, value in args:
             cursor.execute(
-                f"UPDATE users SET {
-                    args[i][0]} = '{
-                    args[i][1]}' WHERE email = '{email}';")
+                f"UPDATE users SET {field} = '{value}' WHERE email = '{email}';")
         connection.commit()
     except pymysql.MySQLError as e:
         return f"Ошибка подключения: {e}"
