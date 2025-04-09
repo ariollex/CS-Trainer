@@ -44,6 +44,7 @@ jobs:
           username: ${{ secrets.PI_USER }}
           key: ${{ secrets.PI_PRIVATE_KEY }}
           port: ${{ secrets.PI_PORT }}
+          envs: DEPLOY_PATH
           script: |
             echo "Переход в: ${DEPLOY_PATH}"
             echo "Navigating to the application directory"
