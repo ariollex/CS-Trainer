@@ -43,7 +43,9 @@ jobs:
           key: ${{ secrets.PI_PRIVATE_KEY }}
           port: ${{ secrets.PI_PORT }}
           script: |
-            echo "Navigating to the application directory"
+            echo "Проверка прав .ssh..."
+            ls -la ~/.ssh
+            echo "Проверка подключения..."
+            ssh -vvv localhost "echo 'Тест успешен!'"
             cd "${DEPLOY_PATH}"
-            echo "Pulling the latest changes from the repository"
             git pull origin main
