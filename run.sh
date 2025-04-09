@@ -1,14 +1,25 @@
 #!/bin/bash
-
 set -e
 
-echo "Updating code from Git repository..."
-git fetch --all
-if ! git pull origin main; then
-    echo "Warning: Git pull failed! Forcing code reset..."
-    git reset --hard origin/main
-    git clean -fd
-    git pull origin main
+if [ -z "${RESTARTED}" ]; then
+    export RESTARTED="true"
+else
+    echo "Skipping git pull in restarted instance"
+    goto_start_server=true
+fi
+
+if [ -z "${goto_start_server}" ]; then
+    echo "Updating code from Git repository..."
+    git fetch --all
+    if ! git pull origin main; then
+        echo "Warning: Git pull failed! Forcing code reset..."
+        git reset --hard origin/main
+        git clean -fd
+        git pull origin main
+    fi
+
+    echo "Restarting script with updated version..."
+    exec ./run.sh
 fi
 
 VENV_DIR="venv"
