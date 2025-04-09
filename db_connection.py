@@ -3,7 +3,7 @@ import json
 
 
 def get_dict_users():
-    query = "SELECT * FROM users;" 
+    query = "SELECT * FROM users;"
     cursor.execute(query)
     data = cursor.fetchall()
     records = from_data_to_dct(data)
