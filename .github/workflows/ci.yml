@@ -46,7 +46,7 @@ jobs:
           port: ${{ secrets.PI_PORT }}
           envs: DEPLOY_PATH
           script: |
-            echo "Navigating to the application directory"
+            echo "Navigating to the repository directory"
             cd "${DEPLOY_PATH}"
             echo "Running the script"
             ./run.sh
