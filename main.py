@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, EmailStr
 import pymysql  # Для связи с базой данных
 from typing import Dict  # Типизация словаря
-from fastapi.middleware.cors import CORSMiddleware  # Middleware для настройки CORS
+from fastapi.middleware.cors import CORSMiddleware  
 from enum import Enum  # Enum для создания перечислений
 import random  # Для генерации случайных чисел
 import uvicorn  # Для запуска приложения
@@ -14,9 +14,6 @@ from db_connection import get_dict_users, save_user, change_db_users
 # Создаем экземпляр приложения FastAPI
 app = FastAPI()
 
-# Добавление CORS middleware для управления доступом к API
-# origins - список разрешенных источников (доменов), которые могут обращаться к API
-# "*" - разрешает доступ с любого источника (используется только для разработки)
 origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
@@ -28,7 +25,6 @@ app.add_middleware(
 )
 
 
-# "База данных" в виде словаря, где ключ - email пользователя, а значение - данные пользователя
 # users: Dict[str, dict] = {}
 users = get_dict_users()
 
@@ -43,7 +39,7 @@ def generate_verification_code() -> str:
     code = f"{
         random.randint(
             0,
-            999999):06d}"  # Генерация числа от 0 до 999999, форматирование до 6 цифр
+            999999):06d}"
     return code
 
 
@@ -166,18 +162,18 @@ class ErrorCodes:
     Класс с кодами ошибок и сообщений.
     Используется для стандартизации ответов API.
     """
-    ALREADY_VERIFIED = 'already_verified'  # Аккаунт уже подтвержден
-    SAVING_FAILED = 'saving_failed'  # Сохранение в базу данных не удалось
-    NOT_ONE_EMAIL = 'not_one_email'  # Существуют пользователи с одинаковыми email
-    USER_NOT_FOUND = "user_not_found"  # Пользователь не найден
-    INVALID_CREDENTIALS = "invalid_credentials"  # Неверные учетные данные
-    USER_EXISTS = "user_exists"  # Пользователь уже существует
-    INVALID_VERIFICATION_CODE = "invalid_verification_code"  # Неверный код верификации
-    ACCOUNT_NOT_VERIFIED = "account_not_verified"  # Аккаунт не верифицирован
-    PASSWORD_CHANGE_SUCCESS = "password_change_success"  # Пароль успешно изменен
-    VERIFICATION_CODE_SENT = "verification_code_sent"  # Код верификации отправлен
-    REGISTRATION_SUCCESS = "registration_success"  # Регистрация успешна
-    VERIFICATION_SUCCESS = "verification_success"  # Верификация успешна
+    ALREADY_VERIFIED = 'already_verified'
+    SAVING_FAILED = 'saving_failed' 
+    NOT_ONE_EMAIL = 'not_one_email' 
+    USER_NOT_FOUND = "user_not_found"  
+    INVALID_CREDENTIALS = "invalid_credentials" 
+    USER_EXISTS = "user_exists" 
+    INVALID_VERIFICATION_CODE = "invalid_verification_code"  
+    ACCOUNT_NOT_VERIFIED = "account_not_verified" 
+    PASSWORD_CHANGE_SUCCESS = "password_change_success" 
+    VERIFICATION_CODE_SENT = "verification_code_sent" 
+    REGISTRATION_SUCCESS = "registration_success" 
+    VERIFICATION_SUCCESS = "verification_success"
 
 
 # Обработчик для входа (логина)
@@ -370,7 +366,8 @@ def change_password(data: ChangePasswordRequest):
             detail={"code": ErrorCodes.INVALID_VERIFICATION_CODE}
         )
     # Обновляем пароль
-    trace_back = change_db_users(user['email'], (('password', data.password)))
+    trace_back = change_db_users(user['email'], 
+                                 (('password', data.password)))
     if trace_back != 'success':
         raise HTTPException(
             # справить код ошибки
