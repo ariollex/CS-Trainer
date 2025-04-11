@@ -48,8 +48,12 @@ def from_data_to_dct(data):
         records[i[1]] = {'email': i[1],
                'password': i[2],
                'nickname': i[3],
-               'verified': i[4],
-               'verification_code': i[5]}
+               'achievement': i[4],
+               'avatar': i[5],
+               'fundamentals': i[6],
+               'algorithms': i[7],
+               'verified': i[8],
+               'verification_code': i[9]}
     return records
 
 with open('database_user.json') as file:

@@ -435,6 +435,11 @@ def resend_code(data: ResendCodeRequest):
     }
 
 
+@app.post('/api/leaderboard')
+def liderboard():
+    pass
+
+
 # Точка входа в приложение
 if __name__ == "__main__":
     # Запускаем приложение на хосте 0.0.0.0 и порту 8000
