@@ -56,6 +56,13 @@ def update_users():
     global users
     users = get_dict_users()
 
+
+def check_nickname(nickname):
+    for i in users:
+        if nickname == i['nickname']:
+            return False
+    return True
+
 # Модели запросов для валидации входных данных
 class LoginRequest(BaseModel):
     """
@@ -146,6 +153,10 @@ class ResendCodeRequest(BaseModel):
     code_type: CodeType
 
 
+class LeaderboardRequest(BaseModel):
+    type: str
+
+
 # Функция для генерации фиктивного токена
 def generate_token(email: str) -> str:
     """
@@ -167,6 +178,7 @@ class ErrorCodes:
     USER_NOT_FOUND = "user_not_found"  # Пользователь не найден
     INVALID_CREDENTIALS = "invalid_credentials"  # Неверные учетные данные
     USER_EXISTS = "user_exists"  # Пользователь уже существует
+    NICKNAME_EXISTS = 'nickname_exist' # Этот ник уже занят
     INVALID_VERIFICATION_CODE = "invalid_verification_code"  # Неверный код верификации
     ACCOUNT_NOT_VERIFIED = "account_not_verified"  # Аккаунт не верифицирован
     PASSWORD_CHANGE_SUCCESS = "password_change_success"  # Пароль успешно изменен
@@ -223,6 +235,13 @@ def register(data: RegisterRequest):
             detail={"code": ErrorCodes.USER_EXISTS}
         )
 
+    if check_nickname(data.nickname):
+        # Если этот ник уже занят, возвращаем ошибку 400
+        raise HTTPException(
+            status_code=400,
+            detail={"code": ErrorCodes.NICKNAME_EXISTS}
+        )
+
     # Генерируем код верификации
     verification_code = generate_verification_code()
 
@@ -269,7 +288,7 @@ def verify(data: VerifyRequest):
             detail={"code": ErrorCodes.INVALID_VERIFICATION_CODE}
         )
     # Активируем аккаунт
-    trace_back = change_db_users(user['email'], (('verified', True)))
+    trace_back = change_db_users(user['email'], (('verified', 1)))
     if trace_back != 'success':
         raise HTTPException(
             # справить код ошибки
@@ -436,7 +455,7 @@ def resend_code(data: ResendCodeRequest):
 
 
 @app.post('/api/leaderboard')
-def liderboard():
+def leaderboard(data: LeaderboardRequest):
     pass
 
 

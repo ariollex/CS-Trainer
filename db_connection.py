@@ -11,14 +11,37 @@ def get_dict_users():
 
 def save_user(email, password, nickname, verified, verification_code):
     try:
-        query = f"""insert users(email, password, nickname, verified, verification_code)
-            values ('{email}', '{password}', '{nickname}', {verified}, '{verification_code}')"""
+        query = f"""insert users(email, password, nickname, achievenment, avatar, fundamentals, algorithms, verified, verification_code)
+            values ('{email}', '{password}', '{nickname}', '123', 'aaa', 0, 0, {verified}, '{verification_code}')"""
         cursor.execute(query)
         connection.commit()
+        return 'success'
     except pymysql.MySQLError as e:
         return f"Ошибка подключения: {e}"
-    finally:
-        return 'success'
+
+
+def get_fundamentals_sort():
+    query = f"""SELECT fundamentals.*, users.nickname, users.achievement, users.avatar
+                FROM fundamentals
+                JOIN users ON fundamentals.user_id = users.id
+                ORDER BY fundamentals.score;"""
+    cursor.execute(query)
+    data = cursor.fetchall()
+    # records = from_data_to_dct(data)
+    # return records
+
+
+def get_algorithms_sort():
+    query = f"""SELECT algorithms.*, users.nickname, users.achievement, users.avatar
+                FROM algorithms
+                JOIN users ON algorithms.user_id = users.id
+                ORDER BY algorithms.score;"""
+    cursor.execute(query)
+    data = cursor.fetchall()
+    # records = from_data_to_dct(data)
+    # return records
+
+
 
 def change_db_users(email, *args):
     try:
@@ -28,10 +51,10 @@ def change_db_users(email, *args):
                 WHERE email = '{email}';"""
             cursor.execute(query)
         connection.commit()
+        return 'success'
     except pymysql.MySQLError as e:
         return f"Ошибка подключения: {e}"
-    finally:
-        return 'success'
+
 
 def user_information(email):
     cursor.execute(f"SELECT * FROM users WHERE email = '{email}';")
@@ -45,7 +68,8 @@ def user_information(email):
 def from_data_to_dct(data):
     records = dict()
     for i in data:
-        records[i[1]] = {'email': i[1],
+        records[i[1]] = {'id': i[0],
+                'email': i[1],
                'password': i[2],
                'nickname': i[3],
                'achievement': i[4],
@@ -56,7 +80,7 @@ def from_data_to_dct(data):
                'verification_code': i[9]}
     return records
 
-with open('database_user.json') as file:
+with open('database_user_home.json') as file:
     file_json_data = json.load(file)
 try:
     connection = pymysql.connect(
