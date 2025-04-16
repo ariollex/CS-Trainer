@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware  # Middleware для наст
 from enum import Enum  # Enum для создания перечислений
 import random  # Для генерации случайных чисел
 import uvicorn  # Для запуска приложения
-from db_connection import get_dict_users, save_user, change_db_users
+from db_connection import get_dict_users, save_user, change_db_users, get_leaderboard
 
 # Создаем экземпляр приложения FastAPI
 app = FastAPI()
@@ -151,10 +151,6 @@ class ResendCodeRequest(BaseModel):
     """
     email: EmailStr
     code_type: CodeType
-
-
-class LeaderboardRequest(BaseModel):
-    type: str
 
 
 # Функция для генерации фиктивного токена
@@ -454,9 +450,12 @@ def resend_code(data: ResendCodeRequest):
     }
 
 
-@app.post('/api/leaderboard')
-def leaderboard(data: LeaderboardRequest):
-    pass
+@app.post('/auth/leaderboard')
+def leaderboard():
+    print('0')
+    info = get_leaderboard(len(users))
+    print(info)
+    return info
 
 
 # Точка входа в приложение

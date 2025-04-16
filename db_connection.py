@@ -2,6 +2,19 @@ import pymysql
 import json
 
 
+def get_leaderboard(number_of_users):
+    fundamentals = get_fundamentals_sort()
+    algorithms = get_algorithms_sort()
+    result = dict()
+    if number_of_users < 200:
+        result['fundamentals'] = fundamentals
+        result['algorithms'] = algorithms
+    else:
+        result['fundamentals'] = fundamentals[:100]
+        result['algorithms'] = algorithms[:100]
+    return result
+
+
 def get_dict_users():
     query = f"SELECT * FROM users;"  # Запрос для получения всех данных из таблицы
     cursor.execute(query)
@@ -66,9 +79,9 @@ def user_information(email):
     return users_from_data_to_dct(data)
 
 def users_from_data_to_dct(data):
-    records = dict()
+    records = list()
     for i in data:
-        records[i[1]] = {'id': i[0],
+        records.append({'id': i[0],
                 'email': i[1],
                'password': i[2],
                'nickname': i[3],
@@ -77,13 +90,14 @@ def users_from_data_to_dct(data):
                'fundamentals': i[6],
                'algorithms': i[7],
                'verified': i[8],
-               'verification_code': i[9]}
+               'verification_code': i[9]
+                })
     return records
 
 def fund_alg_from_data_to_dct(data):
-    records = dict()
+    records = list()
     for i in data:
-        records[i[1]] = {'id': i[0],
+        records.append({'id': i[0],
                 'users_id': i[1],
                'score': i[2],
                'testPassed': i[3],
@@ -91,7 +105,7 @@ def fund_alg_from_data_to_dct(data):
                'lastActivity': i[5],
                'nickname': i[6],
                'achievement': i[7]
-            }
+            })
     return records
 
 with open('database_user_home.json') as file:
@@ -104,7 +118,6 @@ try:
         database=file_json_data['database']
     )
     cursor = connection.cursor()
-    print(get_algorithms_sort())
 except pymysql.MySQLError as e:
     print(f"Ошибка подключения: {e}")
 # finally:
