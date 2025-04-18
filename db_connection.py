@@ -34,10 +34,21 @@ def save_user(email, password, nickname, verified, verification_code):
 
 
 def get_fundamentals_sort():
-    query = f"""SELECT fundamentals.*, users.nickname, users.achievement, users.avatar
-                FROM fundamentals
-                JOIN users ON fundamentals.users_id = users.id
-                ORDER BY fundamentals.score"""
+    query = """
+        SELECT 
+            f.id,
+            f.user_id,
+            f.score,
+            f.testsPassed,
+            f.totalTests,
+            f.lastActivity,
+            u.nickname,
+            u.avatar
+        FROM fundamentals AS f
+        JOIN users AS u
+          ON f.user_id = u.id
+        ORDER BY f.score DESC;
+    """
     cursor.execute(query)
     data = cursor.fetchall()
     records = fund_alg_from_data_to_dct(data)
@@ -45,15 +56,25 @@ def get_fundamentals_sort():
 
 
 def get_algorithms_sort():
-    query = f"""SELECT algorithms.*, users.nickname, users.achievement, users.avatar
-                FROM algorithms
-                JOIN users ON algorithms.users_id = users.id
-                ORDER BY algorithms.score;"""
+    query = """
+        SELECT 
+            a.id,
+            a.user_id,
+            a.score,
+            a.testsPassed,
+            a.totalTests,
+            a.lastActivity,
+            u.nickname,
+            u.avatar
+        FROM algorithms AS a
+        JOIN users AS u
+          ON a.user_id = u.id
+        ORDER BY a.score DESC;
+    """
     cursor.execute(query)
     data = cursor.fetchall()
     records = fund_alg_from_data_to_dct(data)
     return records
-
 
 
 def change_db_users(email, *args):
@@ -82,30 +103,29 @@ def users_from_data_to_dct(data):
     records = list()
     for i in data:
         records.append({'id': i[0],
-                'email': i[1],
-               'password': i[2],
-               'nickname': i[3],
-               'achievement': i[4],
-               'avatar': i[5],
-               'fundamentals': i[6],
-               'algorithms': i[7],
-               'verified': i[8],
-               'verification_code': i[9]
+                 'email': i[1],
+                'password': i[2],
+                'nickname': i[3],
+                'achievement': i[4],
+                'avatar': i[5],
+                'fund_id': i[6],
+                'algo_id': i[7],
+                'verified': i[8],
+                'verification_code': i[9]
                 })
     return records
 
 def fund_alg_from_data_to_dct(data):
-    records = list()
+    records = []
     for i in data:
-        records.append({'id': i[0],
-                'users_id': i[1],
-               'score': i[2],
-               'testPassed': i[3],
-               'totalTests': i[4],
-               'lastActivity': i[5],
-               'nickname': i[6],
-               'achievement': i[7]
-            })
+        records.append({
+            'id':          i[0],
+            'user_id':     i[1],
+            'score':       i[2],
+            'testPassed':  i[3],
+            'totalTests':  i[4],
+            'lastActivity':i[5],
+        })
     return records
 
 with open('database_user_home.json') as file:

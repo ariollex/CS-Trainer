@@ -60,8 +60,8 @@ def update_users():
 def check_nickname(nickname):
     for i in users:
         if nickname == i['nickname']:
-            return False
-    return True
+            return True
+    return False
 
 # Модели запросов для валидации входных данных
 class LoginRequest(BaseModel):
@@ -450,9 +450,8 @@ def resend_code(data: ResendCodeRequest):
     }
 
 
-@app.post('/auth/leaderboard')
+@app.get('/api/leaderboard')
 def leaderboard():
-    print('0')
     info = get_leaderboard(len(users))
     print(info)
     return info
